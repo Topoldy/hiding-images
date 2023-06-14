@@ -1,0 +1,5 @@
+﻿  pch.cpp
+  dllmain.cpp
+C:\Users\user\source\libraries\AES\AES\dllmain.cpp(279): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+     Создается библиотека C:\Users\user\source\libraries\AES\x64\Debug\AES.lib и объект C:\Users\user\source\libraries\AES\x64\Debug\AES.exp
+  AES.vcxproj -> C:\Users\user\source\libraries\AES\x64\Debug\AES.dll
