@@ -32,7 +32,6 @@ namespace formAES
             stream = tcpClient.GetStream();
 
             this.login = login;
-            label_login.Text = $"Ваш пользователь: \"{login}\"";
 
             path_send_files = new List<string>();
 
@@ -123,7 +122,7 @@ namespace formAES
             if (InvokeRequired)
                 Invoke((Action<string>)ToTextBox_logs, text);
             else
-                textBox_logs.Text += text + "\r\n";
+                textBox_logs.Text = text + "\r\n" + textBox_logs.Text;
         }
 
         private byte[] ToBytes(UInt32 number)
@@ -230,19 +229,6 @@ namespace formAES
 
                                 byte[] buff_res = new byte[2];
 
-                                //if (!stream.ReadAsync(buff_res, 0, 2).Wait(1000))
-                                //{
-                                //    ToTextBox_logs("Сервер перестал отсылать");
-                                //    continue; // прекращаем отправку
-                                //}
-                                //else
-                                //{
-                                //    if (!(buff_res[0] == 0x06 && buff_res[1] == 0))
-                                //    {
-                                //        ToTextBox_logs("Сервер не то прислал");
-                                //        continue;
-                                //    }
-                                //}
 
                                 int size = file_bytes.Length;
                                 int max_size_buff = UInt16.MaxValue + 1;
@@ -269,27 +255,6 @@ namespace formAES
                                     {
                                         buff[i] = file_bytes[max_size_buff * k + i];
                                     }
-
-                                    //for (int i = 0; i < file_bytes.Length; i++) // передаём само изображение
-                                    //{
-                                    //    buff[2 + size_file_name + 4] = file_bytes[i];
-                                    //}
-
-                                    //if (!stream.ReadAsync(buff_res, 0, 2).Wait(1000))
-                                    //{
-                                    //    ToTextBox_logs("Сервер перестал отсылать");
-                                    //    continue; // прекращаем отправку
-                                    //}
-                                    //else
-                                    //{
-                                    //    if (!(buff_res[0] == 0x06 && buff_res[1] == 0))
-                                    //    {
-                                    //        ToTextBox_logs("Сервер не то прислал");
-                                    //        continue;
-                                    //    }
-                                    //}
-
-                                    //Thread.Sleep(500);
 
                                     if (!stream.ReadAsync(buff_isReady, 0, 1).Wait(500))
                                     {
@@ -334,7 +299,7 @@ namespace formAES
                             ToTextBox_logs("Пользователь отклонил запрос");
                         }
                     }
-                    else if (operation == 5) // получение сообщений
+                    else if (operation == 5) // получение сообщений-картинок
                     {
                         UInt32 count;
                         UInt32 size;
@@ -355,7 +320,7 @@ namespace formAES
                                 $"Пользователь \"{user_login}\"\n" +
                                 $"Хочет прислать {count} картинок\n" +
                                 $"Общим размером в {size} байт", 
-                                "Скачать?", MessageBoxButtons.YesNo);
+                                "Скачать изображения?", MessageBoxButtons.YesNo);
                             stopWatch.Stop();
 
                             if (stopWatch.ElapsedMilliseconds < 9000) // 9 секун на ответ
@@ -422,7 +387,7 @@ namespace formAES
                                                 k++;
                                             }
 
-                                            File.WriteAllBytes(file_name, file_bytes);
+                                            File.WriteAllBytes("encrypted images\\" + file_name, file_bytes);
 
                                             stream.Write(buff_isReady, 0, buff_isReady.Length); // сообщение о том, что мы прочитали всё
                                         }
@@ -443,9 +408,172 @@ namespace formAES
 
                         }
                     }
-                    else if (operation == 6)
+                    else if (operation == 6) // скачать ли ключи?
                     {
+                        UInt32 count;
+                        string user_login;
 
+                        int status = ClientResponses.SendItKeysRequest(stream, out count, out user_login);
+
+                        if (status != 0)
+                        {
+                            ToTextBox_logs("Ошибка получения");
+                        }
+                        else
+                        {
+                            Stopwatch stopWatch = new Stopwatch();
+
+                            stopWatch.Start();
+                            DialogResult dialogResult = MessageBox.Show(
+                                $"Пользователь \"{user_login}\"\n" +
+                                $"Хочет прислать {count} ключей\n",
+                                "Скачать ключи?", MessageBoxButtons.YesNo);
+                            stopWatch.Stop();
+
+                            if (stopWatch.ElapsedMilliseconds < 9000) // 9 секун на ответ
+                            {
+                                if (dialogResult == DialogResult.Yes)
+                                {
+                                    if (ClientRequests.SendItImagesRequest(stream, true) != 0)
+                                    {
+                                        MessageBox.Show("Ошибка 1");
+                                    }
+                                    else
+                                    {
+                                        // начинаем принимать файл-ключи
+
+                                        byte[] buff_n = new byte[4];
+
+                                        stream.Read(buff_n, 0, 4);
+
+                                        int n = Convert.ToInt32(toUInt32(buff_n));
+
+                                        while (n > 0)
+                                        {
+                                            n--;
+
+                                            byte size_file_name = Convert.ToByte(stream.ReadByte());
+                                            byte[] buff_file_name = new byte[size_file_name];
+                                            stream.Read(buff_file_name, 0, size_file_name);
+                                            string file_name = Encoding.UTF8.GetString(buff_file_name); // получили имя файла
+
+                                            byte[] file_bytes = new byte[29]; // стандарт для ключа - 29 байт
+
+                                            stream.Read(file_bytes, 0, 29);
+
+                                            File.WriteAllBytes("keys\\" + file_name + ".key", file_bytes); // сохраняем ключи
+                                        }
+
+                                        byte[] buff_isGood = new byte[2];
+                                        buff_isGood[0] = 0x06;
+                                        buff_isGood[1] = 1; // состояние 1 - всё принял
+
+                                        stream.Write(buff_isGood, 0, buff_isGood.Length); // сообщение о том, что мы всё приняли
+                                    }
+                                }
+                                else if (dialogResult == DialogResult.No)
+                                {
+                                    if (ClientRequests.SendItImagesRequest(stream, false) != 0)
+                                    {
+                                        MessageBox.Show("Ошибка 2");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Вы не успели дать ответ");
+                            }
+
+                        }
+                    }
+                    else if(operation == 7) // отправление ключей
+                    {
+                        int status = ClientResponses.SendItKeysResponse(stream);
+
+                        if (status < 0)
+                        {
+                            ToTextBox_logs("Ошибка при получение данных");
+                        }
+                        else if (status == 1)
+                        {
+                            ToTextBox_logs("Принял запрос");
+
+                            int size = 0;
+                            int n;
+                            int k = 8; // первые 4 байта - размер сообщения, вторые 4 байта - количество ключей
+                            byte[] buff = new byte[65536];
+
+                            for (n = 0; n < path_send_files.Count; n++)
+                            {
+                                string file_name = path_send_files[n].Substring(path_send_files[n].LastIndexOf('\\') + 1); // получаем имя файла
+                                byte[] file_bytes = File.ReadAllBytes("keys\\" + file_name + ".key"); // получаем байты файла
+
+                                byte size_file_name = Convert.ToByte(file_name.Length);
+                                byte[] buff_file_name = Encoding.UTF8.GetBytes(file_name);
+
+                                // заполняем буфер
+                                buff[k] = size_file_name;
+                                k++;
+                                size++;
+
+                                for(int i = 0; i < buff_file_name.Length; i++)
+                                {
+                                    buff[k] = buff_file_name[i];
+                                    k++;
+                                    size++;
+                                }
+
+                                for(int i = 0; i < file_bytes.Length; i++) // у файла .key стандартно 29 байт
+                                {
+                                    buff[k] = file_bytes[i];
+                                    k++;
+                                    size++;
+                                }
+                            }
+
+                            // после заполнения буфера указываем, сколько всего ключей и общий размер "сообщения"
+                            size += 4; // учитываем что ещё и количество ключей передаётся
+                            byte[] buff_size = ToBytes(Convert.ToUInt32(size));
+                            byte[] buff_n = ToBytes(Convert.ToUInt32(n));
+
+                            for(int i = 0; i < 4; i++)
+                            {
+                                buff[i] = buff_size[i];
+                                buff[4 + i] = buff_n[i];
+                            }
+
+                            stream.Write(buff, 0, size + 4);
+
+                            // получаем ответ от сервера "дошло ли сообщение"
+
+                            bool isGood = true; 
+                            byte[] buff_isGood = new byte[1];
+
+                            if (!stream.ReadAsync(buff_isGood, 0, 1).Wait(500))
+                            {
+                                isGood = false;
+                                break;
+                            }
+                            else if (buff_isGood[0] != 1)
+                            {
+                                isGood = false;
+                                break;
+                            }
+
+
+                            if (isGood)
+                            {
+                                ToTextBox_logs("Все ключи доставлены");
+                            }
+                            else
+                            {
+                                ToTextBox_logs("Произошла ошибка при отправке ключей");
+                            }
+                        }
+                        else
+                        {
+                            ToTextBox_logs("Пользователь отклонил запрос");
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -487,6 +615,38 @@ namespace formAES
             }
 
             int status_request = ClientRequests.SendItImagesResponse(stream, count, size, user_login);
+
+            if (status_request != 0)
+            {
+                ToTextBox_logs("Сервер не отвечает");
+            }
+        }
+
+        private void button_send_keys_MouseClick(object sender, MouseEventArgs e)
+        {
+            UInt32 count = 0; // количество выбранных ключей
+
+            path_send_files.Clear();
+
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                if (listView1.Items[i].Selected) // если картинку будем отправлять
+                {   // записываем все файлы, которые мы хотим отправить
+                    string path_send_file = listView1.Items[i].Tag + listView1.Items[i].Text;
+                    path_send_files.Add(path_send_file);
+
+                    count++;
+                }
+            }
+
+            string user_login = textBox_checkForConnection.Text;
+            if (count == 0 || user_login == "")
+            {
+                ToTextBox_logs("Ошибка (выберите ключи и укажите пользователя)");
+                return;
+            }
+
+            int status_request = ClientRequests.SendItKeysResponse(stream, count, user_login);
 
             if (status_request != 0)
             {

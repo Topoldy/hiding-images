@@ -68,10 +68,7 @@ namespace formAES
 
         private Rectangle ToRectangle(Point p1, Point p2)
         {
-            return new Rectangle(Math.Min(p1.X, p2.X), 
-                Math.Min(p1.Y, p2.Y), 
-                Math.Max(p1.X, p2.X) - Math.Min(p1.X, p2.X), 
-                Math.Max(p1.Y, p2.Y) - Math.Min(p1.Y, p2.Y));
+            return new Rectangle(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Max(p1.X, p2.X) - Math.Min(p1.X, p2.X), Math.Max(p1.Y, p2.Y) - Math.Min(p1.Y, p2.Y));
         }
 
         private void Add_image_button_MouseClick(object sender, MouseEventArgs e)

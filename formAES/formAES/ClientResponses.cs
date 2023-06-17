@@ -51,6 +51,17 @@ namespace formAES
             return buff[0];
         }
 
+        public static int SendItKeysResponse(NetworkStream stream)
+        {
+            byte[] buff = new byte[1];
+            if (!stream.ReadAsync(buff, 0, 1).Wait(1000))
+            {
+                return -3;
+            }
+
+            return buff[0];
+        }
+
         public static int SendItImagesRequest(NetworkStream stream, out UInt32 count, out UInt32 size, out string user_login)
         {
             count = 0;
@@ -72,6 +83,40 @@ namespace formAES
 
                 count = toUInt32(buff_count);
                 size = toUInt32(buff_size);
+
+                int size_user_login = Convert.ToInt32(stream.ReadByte());
+                byte[] buff_user_login = new byte[size_user_login];
+
+
+                if (!stream.ReadAsync(buff_user_login, 0, size_user_login).Wait(1000))
+                {
+                    return -3;
+                }
+
+                user_login = Encoding.UTF8.GetString(buff_user_login);
+
+                return 0;
+            }
+            catch
+            {
+                return -5;
+            }
+        }
+
+        public static int SendItKeysRequest(NetworkStream stream, out UInt32 count, out string user_login)
+        {
+            count = 0;
+            user_login = "";
+            try
+            {
+                byte[] buff_count = new byte[4];
+
+                if (!stream.ReadAsync(buff_count, 0, 4).Wait(1000))
+                {
+                    return -3;
+                }
+
+                count = toUInt32(buff_count);
 
                 int size_user_login = Convert.ToInt32(stream.ReadByte());
                 byte[] buff_user_login = new byte[size_user_login];

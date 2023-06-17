@@ -40,10 +40,9 @@ namespace formAES
             // 
             // button_registration
             // 
-            this.button_registration.Location = new System.Drawing.Point(36, 102);
-            this.button_registration.Margin = new System.Windows.Forms.Padding(2);
+            this.button_registration.Location = new System.Drawing.Point(30, 214);
             this.button_registration.Name = "button_registration";
-            this.button_registration.Size = new System.Drawing.Size(126, 32);
+            this.button_registration.Size = new System.Drawing.Size(161, 23);
             this.button_registration.TabIndex = 0;
             this.button_registration.Text = "Зарегистрироваться";
             this.button_registration.UseVisualStyleBackColor = true;
@@ -51,66 +50,60 @@ namespace formAES
             // 
             // textBox_login
             // 
-            this.textBox_login.Location = new System.Drawing.Point(86, 55);
-            this.textBox_login.Margin = new System.Windows.Forms.Padding(2);
+            this.textBox_login.Location = new System.Drawing.Point(97, 86);
             this.textBox_login.Name = "textBox_login";
-            this.textBox_login.Size = new System.Drawing.Size(76, 20);
+            this.textBox_login.Size = new System.Drawing.Size(100, 22);
             this.textBox_login.TabIndex = 1;
             this.textBox_login.Text = "1";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(33, 57);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Location = new System.Drawing.Point(27, 89);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 13);
+            this.label1.Size = new System.Drawing.Size(47, 17);
             this.label1.TabIndex = 2;
             this.label1.Text = "Логин";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(33, 80);
-            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label2.Location = new System.Drawing.Point(27, 117);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(45, 13);
+            this.label2.Size = new System.Drawing.Size(57, 17);
             this.label2.TabIndex = 4;
             this.label2.Text = "Пароль";
             // 
             // textBox_password
             // 
-            this.textBox_password.Location = new System.Drawing.Point(86, 78);
-            this.textBox_password.Margin = new System.Windows.Forms.Padding(2);
+            this.textBox_password.Location = new System.Drawing.Point(97, 114);
             this.textBox_password.Name = "textBox_password";
-            this.textBox_password.Size = new System.Drawing.Size(76, 20);
+            this.textBox_password.Size = new System.Drawing.Size(100, 22);
             this.textBox_password.TabIndex = 3;
             this.textBox_password.Text = "1";
             // 
             // label_error
             // 
             this.label_error.AutoSize = true;
-            this.label_error.Location = new System.Drawing.Point(11, 145);
-            this.label_error.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label_error.Location = new System.Drawing.Point(67, 172);
             this.label_error.Name = "label_error";
-            this.label_error.Size = new System.Drawing.Size(0, 13);
+            this.label_error.Size = new System.Drawing.Size(0, 17);
             this.label_error.TabIndex = 5;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(63, 28);
-            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label4.Location = new System.Drawing.Point(67, 53);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(72, 13);
+            this.label4.Size = new System.Drawing.Size(92, 17);
             this.label4.TabIndex = 6;
             this.label4.Text = "Регистрация";
             // 
             // RegistrationForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(194, 167);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label_error);
             this.Controls.Add(this.label2);
@@ -118,9 +111,8 @@ namespace formAES
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox_login);
             this.Controls.Add(this.button_registration);
-            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "RegistrationForm";
-            this.Text = "Регистрация";
+            this.Text = "RegistrationForm";
             this.ResumeLayout(false);
             this.PerformLayout();
 

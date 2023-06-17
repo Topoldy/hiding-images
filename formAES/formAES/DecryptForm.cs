@@ -262,7 +262,7 @@ namespace formAES
 
                     ImageFormat imgForm;
 
-                    bool isDeleteEncryptImg = false;
+                    bool isDeleteEncryptImg = true;
 
                     if (picture_name.EndsWith(".bmp"))
                     {

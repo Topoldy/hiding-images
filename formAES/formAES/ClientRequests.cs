@@ -252,5 +252,40 @@ namespace formAES
                 return -5;
             }
         }
+
+        public static int SendItKeysResponse(NetworkStream stream, UInt32 count, string user_login)
+        {
+            try
+            {
+                byte[] buff = new byte[5 + 1 + user_login.Length];
+                byte[] buff_user_login = Encoding.UTF8.GetBytes(user_login);
+                byte[] buff_count = ToBytes(count);
+                
+
+                buff[0] = 0x07; // код вопроса "отправлять ли ключ"
+                for (int i = 0; i < 4; i++)
+                {
+                    buff[1 + i] = buff_count[i];
+                }
+
+                buff[5] = Convert.ToByte(user_login.Length);
+
+                for (int i = 0; i < user_login.Length; i++)
+                {
+                    buff[6 + i] = buff_user_login[i];
+                }
+
+                if (!stream.WriteAsync(buff, 0, buff.Length).Wait(1000))
+                {
+                    return -4;
+                }
+
+                return 0;
+            }
+            catch
+            {
+                return -5;
+            }
+        }
     }
 }

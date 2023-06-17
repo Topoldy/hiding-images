@@ -101,10 +101,6 @@ namespace formAES
                     Forms.authForm.Show(); // переходим в форму авторизации
                     Close(); // закрываем форму
                 }
-                else if(result == -2)
-                {
-                    label_error.Text = "Сервер не отвечает";
-                }
                 else
                 {
                     label_error.Text = "Такой логин уже существует";
